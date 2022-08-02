@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -22,7 +24,17 @@ public class MainActivity extends AppCompatActivity {
                 sayHi();
             }
         });
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_dropdown_item_1line, COUNTRIES);
+        AutoCompleteTextView textView = (AutoCompleteTextView)findViewById(R.id.country);
+        textView.setThreshold(1);
+        textView.setAdapter(adapter);
+
     }
+    private static  final String[] COUNTRIES = new String[]{
+            "Viet nam","France", "The USA"
+    };
 
     private void sayHi() {
         //refer to the textField
