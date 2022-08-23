@@ -1,0 +1,7 @@
+{
+  "name": "firstReactIonic",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
