@@ -1,0 +1,7 @@
+{
+  "name": "ionicDatabase",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
