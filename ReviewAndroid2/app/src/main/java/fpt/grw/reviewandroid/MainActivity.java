@@ -2,13 +2,20 @@ package fpt.grw.reviewandroid;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.w3c.dom.Text;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,9 +40,22 @@ public class MainActivity extends AppCompatActivity {
 
         Button btnView = findViewById(R.id.btnView);
         btnView.setOnClickListener(view -> {
-            TextView tv = findViewById(R.id.textView);
             DatabaseHelper dbHelper = new DatabaseHelper(this);
-            tv.setText(dbHelper.getExams());
+            List<Exam> exams = dbHelper.getExams();
+            ArrayAdapter<Exam> adapter = new ArrayAdapter<Exam>(this,
+                        android.R.layout.simple_list_item_1,exams);
+            ListView listView = findViewById(R.id.listView);
+            listView.setAdapter(adapter);
+
+            listView.setOnItemClickListener((adapterView, view1, i, l) -> {
+                Exam selectedExam = exams.get(i);
+                Intent intent = new Intent(this,ExamDetails.class);
+                intent.putExtra("id",selectedExam.getId());
+                intent.putExtra("name",selectedExam.getName());
+                intent.putExtra("exam_date",selectedExam.getExam_date());
+                startActivity(intent);
+
+            });
         });
     }
 }
