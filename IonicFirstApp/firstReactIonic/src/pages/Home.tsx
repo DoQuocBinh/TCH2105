@@ -30,8 +30,7 @@ const Home: React.FC = () => {
             <IonIcon slot='end' icon={refreshOutline}></IonIcon>
               Clear</IonButton></IonCol>
           </IonRow>
-        </IonGrid>
-        
+        </IonGrid>       
       </IonContent>
     </IonPage>
   );
