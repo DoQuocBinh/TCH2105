@@ -10,38 +10,41 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import entities.Exam;
+
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "Exams";
+    private static final String TABLE_EXAM = "Exams";
 
-    public static final String ID = "id";
-    public static final String NAME = "name";
+    public static final String EXAM_ID = "exam_id";
+    public static final String EXAM_NAME = "exam_name";
     public static final String EXAM_DATE = "exam_date";
-    public static final String DESCRIPTION = "description";
+    public static final String EXAM_DESCRIPTION = "exam_description";
 
     private SQLiteDatabase database;
 
-    private static final String DATABASE_CREATE = String.format(
+    private static final String EXAM_TABLE_CREATE = String.format(
       "CREATE TABLE %s (" +
       "   %s INTEGER PRIMARY KEY AUTOINCREMENT, " +
       "   %s TEXT, " +
       "   %s TEXT, " +
       "   %s TEXT)",
-      DATABASE_NAME, ID, NAME, EXAM_DATE, DESCRIPTION);
+      DATABASE_NAME, EXAM_ID, EXAM_NAME, EXAM_DATE, EXAM_DESCRIPTION);
 
     public DatabaseHelper(Context context) {
-        super(context, DATABASE_NAME, null, 1);
+        super(context, DATABASE_NAME, null, 5);
         database = getWritableDatabase();
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(DATABASE_CREATE);
+        db.execSQL(EXAM_TABLE_CREATE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + DATABASE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_EXAM);
 
         Log.v(this.getClass().getName(), DATABASE_NAME + " database upgrade to version " +
                 newVersion + " - old data lost");
@@ -51,16 +54,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public long insertExam(String name, String exam_date, String description) {
         ContentValues rowValues = new ContentValues();
 
-        rowValues.put(NAME, name);
+        rowValues.put(EXAM_NAME, name);
         rowValues.put(EXAM_DATE, exam_date);
-        rowValues.put(DESCRIPTION, description);
+        rowValues.put(EXAM_DESCRIPTION, description);
 
-        return database.insertOrThrow(DATABASE_NAME, null, rowValues);
+        return database.insertOrThrow(TABLE_EXAM, null, rowValues);
     }
 
     public List<Exam> getExams() {
-        Cursor cursor = database.query(DATABASE_NAME, new String[] {ID, NAME, EXAM_DATE, DESCRIPTION},
-                null, null, null, null, NAME);
+        Cursor cursor = database.query(TABLE_EXAM, new String[] {EXAM_ID, EXAM_NAME, EXAM_DATE, EXAM_DESCRIPTION},
+                null, null, null, null, EXAM_NAME);
 
         List<Exam> results = new ArrayList<Exam>();
 

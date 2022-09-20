@@ -1,4 +1,4 @@
-package fpt.grw.reviewandroid;
+package entities;
 
 import androidx.annotation.NonNull;
 
