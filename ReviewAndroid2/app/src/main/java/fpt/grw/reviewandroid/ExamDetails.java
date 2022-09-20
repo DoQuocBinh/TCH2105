@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class ExamDetails extends AppCompatActivity {
     ProgressDialog mProgressDialog;
@@ -23,9 +24,7 @@ public class ExamDetails extends AppCompatActivity {
         String date = intent.getStringExtra("exam_date");
 
         EditText inputName = findViewById(R.id.inputNameDetail);
-        EditText inputDate = findViewById(R.id.inputQuestion);
         inputName.setText(name);
-        inputDate.setText(date);
 
         Button btnPrev = findViewById(R.id.btnPrev);
         btnPrev.setOnClickListener(view -> {
@@ -33,6 +32,16 @@ public class ExamDetails extends AppCompatActivity {
             ImageView imageView = findViewById(R.id.imageView);
             DownloadImageTask task = new DownloadImageTask(mProgressDialog,this,imageView);
             task.execute(inputPicURL.getText().toString());
+        });
+        Button btnInsert = findViewById(R.id.btnInsert);
+        btnInsert.setOnClickListener(view -> {
+            EditText inputQuestion = findViewById(R.id.inputQuestion);
+            TextView inputPicURL = findViewById(R.id.inputPictureURL);
+            int exam_id = intent.getIntExtra("id",0);
+            DatabaseHelper dbHelper = new DatabaseHelper(this);
+            long detail_id = dbHelper.insertDetail(exam_id,inputQuestion.getText().toString(),
+                    inputPicURL.getText().toString());
+            Toast.makeText(this, String.valueOf(detail_id), Toast.LENGTH_SHORT).show();
         });
     }
 }

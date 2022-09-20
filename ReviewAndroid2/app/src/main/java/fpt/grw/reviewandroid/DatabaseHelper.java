@@ -16,6 +16,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "Exams";
     private static final String TABLE_EXAM = "Exams";
+    private static final String TABLE_DETAIL = "Details";
+
+    private static final String DETAIL_ID = "detail_id";
+    private static final String DETAIL_QUESTION = "detail_question";
+    private static final String DETAIL_PICTURE_URL = "detail_picture_URL";
 
     public static final String EXAM_ID = "exam_id";
     public static final String EXAM_NAME = "exam_name";
@@ -23,6 +28,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String EXAM_DESCRIPTION = "exam_description";
 
     private SQLiteDatabase database;
+    private static final String DETAIL_TABLE_CREATE = String.format(
+            "CREATE TABLE %s (" +
+                    "   %s INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "   %s INTEGER, " +
+                    "   %s TEXT, " +
+                    "   %s TEXT)",
+            TABLE_DETAIL, DETAIL_ID, EXAM_ID, DETAIL_QUESTION, DETAIL_PICTURE_URL);
 
     private static final String EXAM_TABLE_CREATE = String.format(
       "CREATE TABLE %s (" +
@@ -30,16 +42,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
       "   %s TEXT, " +
       "   %s TEXT, " +
       "   %s TEXT)",
-      DATABASE_NAME, EXAM_ID, EXAM_NAME, EXAM_DATE, EXAM_DESCRIPTION);
+      TABLE_EXAM, EXAM_ID, EXAM_NAME, EXAM_DATE, EXAM_DESCRIPTION);
 
     public DatabaseHelper(Context context) {
-        super(context, DATABASE_NAME, null, 5);
+        super(context, DATABASE_NAME, null, 6);
         database = getWritableDatabase();
     }
-
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(EXAM_TABLE_CREATE);
+        db.execSQL(DETAIL_TABLE_CREATE);
     }
 
     @Override
@@ -49,6 +61,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Log.v(this.getClass().getName(), DATABASE_NAME + " database upgrade to version " +
                 newVersion + " - old data lost");
         onCreate(db);
+    }
+
+    public long insertDetail(int exam_id,String question,String picURL){
+        ContentValues rowValues = new ContentValues();
+
+        rowValues.put(EXAM_ID , exam_id);
+        rowValues.put(DETAIL_QUESTION, question);
+        rowValues.put(DETAIL_PICTURE_URL, picURL);
+        return database.insertOrThrow(TABLE_DETAIL, null, rowValues);
     }
 
     public long insertExam(String name, String exam_date, String description) {
