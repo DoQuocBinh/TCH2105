@@ -87,7 +87,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<ExamDetail> getExamDetails(int examId) {
         List<ExamDetail> result = new ArrayList<ExamDetail>();
 
-        String MY_QUERY = "SELECT b.detail_id, b.exam_id, a.exam_name,b.detail_picture_URL FROM "+ TABLE_EXAM+ " a INNER JOIN "
+        String MY_QUERY = "SELECT b.detail_id, b.exam_id, a.exam_name,b.detail_picture_URL,b.detail_question FROM "+ TABLE_EXAM+ " a INNER JOIN "
                 + TABLE_DETAIL + " b ON a.exam_id=b.exam_id WHERE a.exam_id=?";
         Cursor cursor = database.rawQuery(MY_QUERY,new String[]{String.valueOf(examId)});
         cursor.moveToFirst();
@@ -100,12 +100,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             int exam_id = cursor.getInt(1);
             String exam_name = cursor.getString(2);
             String detail_picture_URL = cursor.getString(3);
+            String detail_question = cursor.getString(4);
 
             ExamDetail examDetails = new ExamDetail();
             examDetails.setExam_id(exam_id);
             examDetails.setDetail_id(detail_id);
             examDetails.setDetail_picture_url(detail_picture_URL);
             examDetails.setExam_name(exam_name);
+            examDetails.setDetail_question(detail_question);
+
             results.add(examDetails);
             cursor.moveToNext();
         }
