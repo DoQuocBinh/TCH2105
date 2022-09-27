@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.squareup.picasso.Picasso;
@@ -82,6 +83,10 @@ public class MyCustomAdapter implements ListAdapter {
            Picasso.with(context)
                    .load(details.getDetail_picture_url())
                    .into(image);
+           //register even user click on Listview Item
+           view.setOnClickListener(view1 -> {
+               Toast.makeText(context, details.getDetail_question(), Toast.LENGTH_SHORT).show();
+           });
        }
        return view;
     }
