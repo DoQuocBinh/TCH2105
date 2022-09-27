@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ReviewAndroid">
         <activity
-            android:name=".ExamDetails"
+            android:name=".ExamDetailsActivity"
             android:parentActivityName=".MainActivity"
             android:exported="true" />
         <activity
