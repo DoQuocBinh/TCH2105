@@ -1,5 +1,7 @@
 package com.example.cameraxdemo;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,9 +14,14 @@ import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import android.app.Activity;
+import android.content.ContentValues;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.widget.Button;
@@ -24,7 +31,9 @@ import android.widget.Toast;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -61,9 +70,11 @@ public class MainActivity extends AppCompatActivity {
                if ( items[item]=="Take picture"){
                    takePicture();
                }else if(items[item]=="Select picture from Gallery"){
-                   Toast.makeText(this, "From Gallery", Toast.LENGTH_SHORT).show();
+                  selectPictureFromGallery();
                }else if(items[item]=="View a picture from an Uri"){
-                   Toast.makeText(this, "From an Uri", Toast.LENGTH_SHORT).show();
+                   String uri = inputPictureUri.getText().toString();
+                   Bitmap bitmap = BitmapFactory.decodeFile(new File(uri).getAbsolutePath());
+                   imageView.setImageBitmap(bitmap);
                    dialog.dismiss();
                }
             });
@@ -72,8 +83,75 @@ public class MainActivity extends AppCompatActivity {
         
     }
 
+    private void selectPictureFromGallery() {
+        Intent intent =new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        selectPicture.launch(intent);
+    }
+    ActivityResultLauncher<Intent> selectPicture = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if(result.getResultCode()== Activity.RESULT_OK){
+                    Intent data = result.getData();
+                    Uri fileUri = data.getData();
+                    try {
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),fileUri);
+                        imageView.setImageBitmap(bitmap);
+
+                        //create a copy of the file in the gallery
+                        String filePath = getApplicationContext().getFilesDir().getAbsolutePath()
+                                + File.separator + String.valueOf(System.currentTimeMillis());
+                        File saveFile = bitmapToFile(bitmap,filePath);
+                        inputPictureUri.setText(saveFile.getAbsolutePath());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+    );
+    public static File bitmapToFile(Bitmap bitmap, String fileNameToSave) {
+        //create a file to write bitmap data
+        File file = null;
+        try {
+            file = new File(fileNameToSave);
+            file.createNewFile();
+
+            //Convert bitmap to byte array
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 0 , bos); // YOU can also save it in JPEG
+            byte[] bitmapdata = bos.toByteArray();
+
+            //write the bytes in file
+            FileOutputStream fos = new FileOutputStream(file);
+            fos.write(bitmapdata);
+            fos.flush();
+            fos.close();
+            return file;
+        }catch (Exception e){
+            e.printStackTrace();
+            return file; // it will return null
+        }
+    }
+
+
     private void takePicture() {
         long timestamp = System.currentTimeMillis();
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, timestamp);
+        contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg");
+        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+            contentValues.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image");
+        }
+
+        //option 1: store in phone's gallery
+        ImageCapture.OutputFileOptions options1 =new ImageCapture.OutputFileOptions.Builder(
+                getContentResolver(),
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                contentValues
+        ).build();
+
         ImageCapture.OutputFileOptions option2 = new ImageCapture.OutputFileOptions.Builder(
                 new File(getApplicationContext().getFilesDir(),String.valueOf(timestamp))
         ).build();
