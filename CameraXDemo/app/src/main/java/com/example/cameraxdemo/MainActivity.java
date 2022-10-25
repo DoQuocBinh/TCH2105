@@ -73,6 +73,10 @@ public class MainActivity extends AppCompatActivity {
                   selectPictureFromGallery();
                }else if(items[item]=="View a picture from an Uri"){
                    String uri = inputPictureUri.getText().toString();
+                   if(uri.length()==0){
+                       inputPictureUri.setError("Khong de trang!");
+                       return;
+                   }
                    Bitmap bitmap = BitmapFactory.decodeFile(new File(uri).getAbsolutePath());
                    imageView.setImageBitmap(bitmap);
                    dialog.dismiss();
